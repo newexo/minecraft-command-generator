@@ -20,9 +20,9 @@ check: format lint test
 
 # Run tests with coverage enforcement (terminal output only)
 coverage:
-	poetry run pytest --cov=template --cov-report=term --cov-fail-under=$(COVERAGE_FAIL)
+	poetry run pytest --cov=mc_commands --cov-report=term --cov-fail-under=$(COVERAGE_FAIL)
 
 # Run tests with coverage and produce an HTML report
 coverage-html:
-	poetry run pytest --cov=template --cov-report=html --cov-fail-under=$(COVERAGE_FAIL)
+	poetry run pytest --cov=mc_commands --cov-report=html --cov-fail-under=$(COVERAGE_FAIL)
 	@echo "HTML coverage report generated at htmlcov/index.html"
