@@ -10,6 +10,8 @@ include = ["data/*", "README.md", "mc_commands/tests/test_data/*"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+minecraft-data = "^3.20.0"
+pydantic = "^2.12.5"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.1"
