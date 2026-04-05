@@ -275,7 +275,7 @@ version = "2026.2.25"
 description = "Python package for providing Mozilla's CA Bundle."
 optional = false
 python-versions = ">=3.7"
-groups = ["notebook"]
+groups = ["main", "notebook"]
 files = [
     {file = "certifi-2026.2.25-py3-none-any.whl", hash = "sha256:027692e4402ad994f1c42e52a4997a9763c646b73e4096e4d5d6db8af1d6f0fa"},
     {file = "certifi-2026.2.25.tar.gz", hash = "sha256:e887ab5cee78ea814d3472169153c2d12cd43b14bd03329a39a9c6e2e80bfba7"},
@@ -384,7 +384,7 @@ version = "3.4.7"
 description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
 optional = false
 python-versions = ">=3.7"
-groups = ["notebook"]
+groups = ["main", "notebook"]
 files = [
     {file = "charset_normalizer-3.4.7-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:cdd68a1fb318e290a2077696b7eb7a21a49163c455979c639bf5a5dcdc46617d"},
     {file = "charset_normalizer-3.4.7-cp310-cp310-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:e17b8d5d6a8c47c85e68ca8379def1303fd360c3e22093a807cd34a71cd082b8"},
@@ -1048,7 +1048,7 @@ version = "3.11"
 description = "Internationalized Domain Names in Applications (IDNA)"
 optional = false
 python-versions = ">=3.8"
-groups = ["notebook"]
+groups = ["main", "notebook"]
 files = [
     {file = "idna-3.11-py3-none-any.whl", hash = "sha256:771a87f49d9defaf64091e6e6fe9c18d4833f140bd19464795bc32d966ca37ea"},
     {file = "idna-3.11.tar.gz", hash = "sha256:795dafcc9c04ed0c1fb032c2aa73654d8e8c5023a7df64a53f39190ada629902"},
@@ -1957,14 +1957,22 @@ files = [
 
 [[package]]
 name = "minecraft-data"
-version = "3.20.0"
+version = "3.20.1"
 description = "Provide easy access to minecraft data in python"
 optional = false
-python-versions = "*"
+python-versions = "^3.11"
 groups = ["main"]
-files = [
-    {file = "minecraft_data-3.20.0.tar.gz", hash = "sha256:930274c08ba7d8451922e74a717f850278277723a15137295d369267e3d5a56f"},
-]
+files = []
+develop = false
+
+[package.dependencies]
+pooch = "^1.9.0"
+
+[package.source]
+type = "git"
+url = "https://github.com/newexo/python-minecraft-data.git"
+reference = "master"
+resolved_reference = "01419aa3bcb2d6a08bb6a6d4d2bda6528b941364"
 
 [[package]]
 name = "mistune"
@@ -2227,7 +2235,7 @@ version = "26.0"
 description = "Core utilities for Python packages"
 optional = false
 python-versions = ">=3.8"
-groups = ["dev", "notebook"]
+groups = ["main", "dev", "notebook"]
 files = [
     {file = "packaging-26.0-py3-none-any.whl", hash = "sha256:b36f1fef9334a5588b4166f8bcd26a14e521f2b55e6b9de3aaa80d3ff7a37529"},
     {file = "packaging-26.0.tar.gz", hash = "sha256:00243ae351a257117b6a241061796684b084ed1c516a08c48a3f7e147a9d80b4"},
@@ -2502,7 +2510,7 @@ version = "4.9.4"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
 optional = false
 python-versions = ">=3.10"
-groups = ["dev", "notebook"]
+groups = ["main", "dev", "notebook"]
 files = [
     {file = "platformdirs-4.9.4-py3-none-any.whl", hash = "sha256:68a9a4619a666ea6439f2ff250c12a853cd1cbd5158d258bd824a7df6be2f868"},
     {file = "platformdirs-4.9.4.tar.gz", hash = "sha256:1ec356301b7dc906d83f371c8f487070e99d3ccf9e501686456394622a01a934"},
@@ -2523,6 +2531,29 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["coverage", "pytest", "pytest-benchmark"]
+
+[[package]]
+name = "pooch"
+version = "1.9.0"
+description = "A friend to fetch your data files"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "pooch-1.9.0-py3-none-any.whl", hash = "sha256:f265597baa9f760d25ceb29d0beb8186c243d6607b0f60b83ecf14078dbc703b"},
+    {file = "pooch-1.9.0.tar.gz", hash = "sha256:de46729579b9857ffd3e741987a2f6d5e0e03219892c167c6578c0091fb511ed"},
+]
+
+[package.dependencies]
+packaging = ">=20.0"
+platformdirs = ">=2.5.0"
+requests = ">=2.19.0"
+
+[package.extras]
+progress = ["tqdm (>=4.41.0,<5.0.0)"]
+sftp = ["paramiko (>=2.7.0)"]
+test = ["pytest-httpserver", "pytest-localftpserver"]
+xxhash = ["xxhash (>=1.4.3)"]
 
 [[package]]
 name = "prometheus-client"
@@ -3207,7 +3238,7 @@ version = "2.33.1"
 description = "Python HTTP for Humans."
 optional = false
 python-versions = ">=3.10"
-groups = ["notebook"]
+groups = ["main", "notebook"]
 files = [
     {file = "requests-2.33.1-py3-none-any.whl", hash = "sha256:4e6d1ef462f3626a1f0a0a9c42dd93c63bad33f9f1c1937509b8c5c8718ab56a"},
     {file = "requests-2.33.1.tar.gz", hash = "sha256:18817f8c57c6263968bc123d237e3b8b08ac046f5456bd1e307ee8f4250d3517"},
@@ -3633,7 +3664,7 @@ version = "2.6.3"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 optional = false
 python-versions = ">=3.9"
-groups = ["notebook"]
+groups = ["main", "notebook"]
 files = [
     {file = "urllib3-2.6.3-py3-none-any.whl", hash = "sha256:bf272323e553dfb2e87d9bfd225ca7b0f467b919d7bbd355436d3fd37cb0acd4"},
     {file = "urllib3-2.6.3.tar.gz", hash = "sha256:1b62b6884944a57dbe321509ab94fd4d3b307075e0c2eae991ac71ee15ad38ed"},
@@ -3713,4 +3744,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "2ea9bbc0dd05e68dd812a9ad8c79dbcd99bdcd2e97afddc007a15a9174f98f61"
+content-hash = "634d6df27ca0e3b9d5ae766fa147f7101c45b455a8e78325bfcf10feb8b3232b"

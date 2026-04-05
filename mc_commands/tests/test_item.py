@@ -9,21 +9,27 @@ from pydantic import ValidationError
 from mc_commands.item import Item
 
 
-def load_minecraft_items(version="1.19.2"):
+def load_minecraft_items(version="1.21.6"):
     """Load items from minecraft-data for a specific version.
 
     Args:
-        version: Minecraft version (e.g., '1.19.2')
+        version: Minecraft version (e.g., '1.21.6')
 
     Returns:
         Dictionary of items loaded from minecraft-data
     """
-    import minecraft_data
+    from minecraft_data.data import get_data_path
 
-    package_dir = os.path.dirname(minecraft_data.__file__)
-    pc_dir = os.path.join(package_dir, "data", "data", "pc")
+    try:
+        data_dir = get_data_path(version)
+    except ValueError:
+        # Version not supported by lazy loading, skip
+        pytest.skip(f"Version {version} not supported by minecraft-data")
 
-    items_file = os.path.join(pc_dir, version, "items.json")
+    items_file = os.path.join(data_dir, "pc", version, "items.json")
+    if not os.path.isfile(items_file):
+        pytest.skip(f"items.json not available for version {version}")
+
     with open(items_file) as f:
         items = json.load(f)
 

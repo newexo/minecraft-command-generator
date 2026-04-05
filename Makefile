@@ -1,5 +1,5 @@
 # Minimum coverage percentage required for tests to pass
-COVERAGE_FAIL = 50
+COVERAGE_FAIL = 90
 
 # Run the test suite
 test:
