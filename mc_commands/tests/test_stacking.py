@@ -5,6 +5,7 @@ import pytest
 from mc_commands.give import GiveCommand
 from mc_commands.item import Item
 from mc_commands.stacking import break_into_stacks, shulker_give
+from mc_commands.target import Target, NEAREST_PLAYER, SELF
 
 
 class TestBreakIntoStacks:
@@ -159,7 +160,7 @@ class TestShulkerGive:
 
     def test_simple_shulker_give(self, dirt, shulker_box):
         """Create shulker box with single item."""
-        cmd = shulker_give([(dirt, 64)], shulker_box, target="@p")
+        cmd = shulker_give([(dirt, 64)], shulker_box, target=NEAREST_PLAYER)
         assert isinstance(cmd, GiveCommand)
         assert cmd.targets.selector == "@p"
         assert cmd.item.item.name == "shulker_box"
@@ -168,7 +169,7 @@ class TestShulkerGive:
 
     def test_multiple_items_in_shulker(self, dirt, bucket, shulker_box):
         """Create shulker box with multiple different items."""
-        cmd = shulker_give([(dirt, 65), (bucket, 50)], shulker_box, target="@s")
+        cmd = shulker_give([(dirt, 65), (bucket, 50)], shulker_box, target=SELF)
         assert cmd.targets.selector == "@s"
         # Should have: 2 stacks of dirt (64+1) + 4 stacks of bucket (16+16+16+2) = 6 stacks total
         assert "slot:0" in cmd.item.components
@@ -183,12 +184,16 @@ class TestShulkerGive:
 
     def test_shulker_named_player(self, dirt, shulker_box):
         """Target can be a player name."""
-        cmd = shulker_give([(dirt, 32)], shulker_box, target="PlayerName")
+        cmd = shulker_give(
+            [(dirt, 32)], shulker_box, target=Target(selector="PlayerName")
+        )
         assert cmd.targets.selector == "PlayerName"
 
     def test_shulker_with_selector_modifiers(self, dirt, shulker_box):
         """Target can include selector modifiers."""
-        cmd = shulker_give([(dirt, 32)], shulker_box, target="@a[gamemode=survival]")
+        cmd = shulker_give(
+            [(dirt, 32)], shulker_box, target=Target(selector="@a[gamemode=survival]")
+        )
         assert cmd.targets.selector == "@a[gamemode=survival]"
 
     def test_shulker_count_always_one(self, dirt, shulker_box):

@@ -4,72 +4,48 @@ import pytest
 from pydantic import ValidationError
 
 from mc_commands.container import Container, ContainerItem
-from mc_commands.give import GiveCommand, GiveCount, GiveItem, GiveTargets
+from mc_commands.give import GiveCommand, GiveCount, GiveItem
 from mc_commands.item import Item
+from mc_commands.target import Target, SELF, ALL_PLAYERS, NEAREST_PLAYER
 
 
-class TestGiveTargets:
-    """Tests for entity selector validation."""
-
-    def test_selector_at_s(self):
-        """@s (self) is valid."""
-        targets = GiveTargets(selector="@s")
-        assert targets.selector == "@s"
-
-    def test_selector_at_a(self):
-        """@a (all players) is valid."""
-        targets = GiveTargets(selector="@a")
-        assert targets.selector == "@a"
-
-    def test_selector_at_p(self):
-        """@p (nearest player) is valid."""
-        targets = GiveTargets(selector="@p")
-        assert targets.selector == "@p"
-
-    def test_selector_at_r(self):
-        """@r (random player) is valid."""
-        targets = GiveTargets(selector="@r")
-        assert targets.selector == "@r"
-
-    def test_selector_at_e(self):
-        """@e (all entities) is valid."""
-        targets = GiveTargets(selector="@e")
-        assert targets.selector == "@e"
+class TestTargetValidation:
+    """Tests for Target selector validation logic."""
 
     def test_selector_with_modifiers(self):
         """Selector with brackets is valid."""
-        targets = GiveTargets(selector="@a[distance=..10]")
-        assert targets.selector == "@a[distance=..10]"
+        target = Target(selector="@a[distance=..10]")
+        assert target.selector == "@a[distance=..10]"
 
     def test_player_name(self):
         """Player name is valid."""
-        targets = GiveTargets(selector="PlayerName")
-        assert targets.selector == "PlayerName"
+        target = Target(selector="PlayerName")
+        assert target.selector == "PlayerName"
 
     def test_player_name_with_underscore(self):
         """Player name with underscore is valid."""
-        targets = GiveTargets(selector="Player_123")
-        assert targets.selector == "Player_123"
+        target = Target(selector="Player_123")
+        assert target.selector == "Player_123"
 
     def test_player_name_with_hyphen(self):
         """Player name with hyphen is valid."""
-        targets = GiveTargets(selector="Player-Name")
-        assert targets.selector == "Player-Name"
+        target = Target(selector="Player-Name")
+        assert target.selector == "Player-Name"
 
     def test_invalid_selector_type(self):
         """Invalid @ selector raises error."""
         with pytest.raises(ValidationError):
-            GiveTargets(selector="@x")
+            Target(selector="@x")
 
     def test_unclosed_brackets(self):
         """Unclosed brackets raise error."""
         with pytest.raises(ValidationError):
-            GiveTargets(selector="@a[distance=..10")
+            Target(selector="@a[distance=..10")
 
     def test_whitespace_stripped(self):
         """Leading/trailing whitespace is stripped."""
-        targets = GiveTargets(selector="  @s  ")
-        assert targets.selector == "@s"
+        target = Target(selector="  @s  ")
+        assert target.selector == "@s"
 
 
 class TestGiveItem:
@@ -156,7 +132,7 @@ class TestGiveCommand:
     def test_simple_give_command(self):
         """Simple give command with minimal args."""
         cmd = GiveCommand(
-            targets=GiveTargets(selector="@s"),
+            targets=SELF,
             item=GiveItem(
                 item=Item(id=264, name="diamond", display_name="Diamond", stack_size=64)
             ),
@@ -167,7 +143,7 @@ class TestGiveCommand:
     def test_give_command_with_count(self):
         """Give command with explicit count."""
         cmd = GiveCommand(
-            targets=GiveTargets(selector="@a"),
+            targets=ALL_PLAYERS,
             item=GiveItem(
                 item=Item(id=1, name="stone", display_name="Stone", stack_size=64)
             ),
@@ -178,7 +154,7 @@ class TestGiveCommand:
     def test_give_command_with_components(self):
         """Give command with data components."""
         cmd = GiveCommand(
-            targets=GiveTargets(selector="@s"),
+            targets=SELF,
             item=GiveItem(
                 item=Item(
                     id=268,
@@ -195,7 +171,7 @@ class TestGiveCommand:
     def test_give_command_to_command(self):
         """to_command returns without leading slash."""
         cmd = GiveCommand(
-            targets=GiveTargets(selector="@s"),
+            targets=SELF,
             item=GiveItem(
                 item=Item(id=264, name="diamond", display_name="Diamond", stack_size=64)
             ),
@@ -206,7 +182,7 @@ class TestGiveCommand:
     def test_give_command_player_name(self):
         """Give command to named player."""
         cmd = GiveCommand(
-            targets=GiveTargets(selector="PlayerName"),
+            targets=Target(selector="PlayerName"),
             item=GiveItem(
                 item=Item(id=264, name="diamond", display_name="Diamond", stack_size=64)
             ),
@@ -217,7 +193,7 @@ class TestGiveCommand:
     def test_give_command_with_selector_modifiers(self):
         """Give command with selector modifiers."""
         cmd = GiveCommand(
-            targets=GiveTargets(selector="@a[gamemode=survival]"),
+            targets=Target(selector="@a[gamemode=survival]"),
             item=GiveItem(
                 item=Item(id=264, name="diamond", display_name="Diamond", stack_size=64)
             ),
@@ -228,7 +204,7 @@ class TestGiveCommand:
     def test_count_one_omitted(self):
         """Count of 1 is omitted from command."""
         cmd = GiveCommand(
-            targets=GiveTargets(selector="@s"),
+            targets=SELF,
             item=GiveItem(
                 item=Item(id=264, name="diamond", display_name="Diamond", stack_size=64)
             ),
@@ -241,7 +217,7 @@ class TestGiveCommand:
     def test_count_greater_than_one_included(self):
         """Count > 1 is included in command."""
         cmd = GiveCommand(
-            targets=GiveTargets(selector="@s"),
+            targets=SELF,
             item=GiveItem(
                 item=Item(id=264, name="diamond", display_name="Diamond", stack_size=64)
             ),
@@ -259,7 +235,7 @@ class TestGiveCommand:
             ]
         )
         cmd = GiveCommand(
-            targets=GiveTargets(selector="@p"),
+            targets=NEAREST_PLAYER,
             item=GiveItem(
                 item=Item(
                     id=454,
