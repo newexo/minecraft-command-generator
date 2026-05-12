@@ -3,6 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
+from mc_commands.container import Container, ContainerItem
 from mc_commands.give import GiveCommand, GiveCount, GiveItem, GiveTargets
 from mc_commands.item import Item
 
@@ -80,21 +81,21 @@ class TestGiveItem:
             item=Item(id=264, name="diamond", display_name="Diamond", stack_size=64)
         )
         assert item.item.name == "diamond"
-        assert item.nbt is None
+        assert item.components is None
 
-    def test_item_with_nbt(self):
-        """Item with NBT data is valid."""
+    def test_item_with_components(self):
+        """Item with data components is valid."""
         item = GiveItem(
             item=Item(
                 id=268, name="wooden_sword", display_name="Wooden Sword", stack_size=1
             ),
-            nbt='{Enchantments:[{id:"minecraft:sharpness",lvl:5}]}',
+            components='[enchantments={"minecraft:sharpness":5}]',
         )
-        assert item.nbt is not None
-        assert "Enchantments" in item.nbt
+        assert item.components is not None
+        assert "enchantments" in item.components
 
-    def test_invalid_nbt_missing_braces(self):
-        """NBT without braces raises error."""
+    def test_invalid_components_missing_brackets(self):
+        """Data components without brackets raises error."""
         with pytest.raises(ValidationError):
             GiveItem(
                 item=Item(
@@ -103,11 +104,11 @@ class TestGiveItem:
                     display_name="Wooden Sword",
                     stack_size=1,
                 ),
-                nbt="Enchantments:[...]",
+                components="enchantments={...}",
             )
 
-    def test_invalid_nbt_unclosed_brace(self):
-        """Unclosed brace raises error."""
+    def test_invalid_components_unclosed_bracket(self):
+        """Unclosed bracket raises error."""
         with pytest.raises(ValidationError):
             GiveItem(
                 item=Item(
@@ -116,7 +117,7 @@ class TestGiveItem:
                     display_name="Wooden Sword",
                     stack_size=1,
                 ),
-                nbt="{Enchantments:[...]",
+                components="[enchantments={...}",
             )
 
 
@@ -174,8 +175,8 @@ class TestGiveCommand:
         )
         assert str(cmd) == "/give @a stone 32"
 
-    def test_give_command_with_nbt(self):
-        """Give command with NBT data."""
+    def test_give_command_with_components(self):
+        """Give command with data components."""
         cmd = GiveCommand(
             targets=GiveTargets(selector="@s"),
             item=GiveItem(
@@ -185,11 +186,11 @@ class TestGiveCommand:
                     display_name="Wooden Sword",
                     stack_size=1,
                 ),
-                nbt="{Enchantments:[]}",
+                components="[enchantments={}]",
             ),
             count=GiveCount(count=1),
         )
-        assert str(cmd) == "/give @s wooden_sword{Enchantments:[]}"
+        assert str(cmd) == "/give @s wooden_sword[enchantments={}]"
 
     def test_give_command_to_command(self):
         """to_command returns without leading slash."""
@@ -248,3 +249,26 @@ class TestGiveCommand:
         )
         assert " 2" in str(cmd)
         assert str(cmd) == "/give @s diamond 2"
+
+    def test_shulker_box_with_dirt_and_glass(self):
+        """Give shulker box containing dirt and glass."""
+        container = Container(
+            items=[
+                ContainerItem(slot=0, item_id="minecraft:dirt", count=64),
+                ContainerItem(slot=1, item_id="minecraft:glass", count=64),
+            ]
+        )
+        cmd = GiveCommand(
+            targets=GiveTargets(selector="@p"),
+            item=GiveItem(
+                item=Item(
+                    id=454,
+                    name="shulker_box",
+                    display_name="Shulker Box",
+                    stack_size=1,
+                ),
+                components=container.to_component(),
+            ),
+        )
+        expected = '/give @p shulker_box[container=[{slot:0,item:{id:"minecraft:dirt",count:64}},{slot:1,item:{id:"minecraft:glass",count:64}}]]'
+        assert str(cmd) == expected
