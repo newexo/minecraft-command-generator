@@ -58,25 +58,25 @@ class GiveTargets(BaseModel):
 class GiveItem(BaseModel):
     """Validated item for give command.
 
-    Can be a simple item name or item with NBT data.
+    Can be a simple item name or item with data components.
     """
 
     item: Item = Field(..., description="Item to give")
-    nbt: Optional[str] = Field(
+    components: Optional[str] = Field(
         None,
-        description="Optional NBT data (e.g., {Enchantments:[...]})",
+        description="Optional data components (e.g., [enchantments={...}])",
     )
 
-    @field_validator("nbt")
+    @field_validator("components")
     @classmethod
-    def validate_nbt(cls, v: Optional[str]) -> Optional[str]:
-        """Basic NBT validation - must start with { and end with }."""
+    def validate_components(cls, v: Optional[str]) -> Optional[str]:
+        """Validate data component syntax - must start with [ and end with ]."""
         if v is None:
             return None
 
         v = v.strip()
-        if not v.startswith("{") or not v.endswith("}"):
-            raise ValueError("NBT data must be enclosed in braces: {...}")
+        if not v.startswith("[") or not v.endswith("]"):
+            raise ValueError("Data components must be enclosed in brackets: [...]")
 
         return v
 
@@ -102,8 +102,8 @@ class GiveCommand(BaseModel):
         """
         command = f"give {self.targets.selector} {self.item.item.name}"
 
-        if self.item.nbt:
-            command += self.item.nbt
+        if self.item.components:
+            command += self.item.components
 
         if self.count.count > 1:
             command += f" {self.count.count}"
