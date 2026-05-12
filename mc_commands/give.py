@@ -5,54 +5,7 @@ from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 
 from mc_commands.item import Item
-
-
-class GiveTargets(BaseModel):
-    """Validated entity selector for give command targets."""
-
-    selector: str = Field(
-        ...,
-        description="Entity selector (e.g., @s, @a, @p, PlayerName, @a[distance=..10])",
-    )
-
-    @field_validator("selector")
-    @classmethod
-    def validate_selector(cls, v: str) -> str:
-        """Validate entity selector format.
-
-        Valid selectors:
-        - Named player: PlayerName
-        - Selector variables: @s, @a, @p, @r, @e
-        - With modifiers: @a[distance=..10]
-        """
-        v = v.strip()
-
-        # Check for named player (alphanumeric, underscores, hyphens)
-        if v and not v.startswith("@"):
-            if all(c.isalnum() or c in "_-" for c in v):
-                return v
-            raise ValueError(f"Invalid player name format: {v}")
-
-        # Check for @ selector
-        if v.startswith("@"):
-            if len(v) < 2:
-                raise ValueError("Selector must be @s, @a, @p, @r, or @e")
-
-            selector_type = v[1]
-            if selector_type not in "sapre":
-                raise ValueError(
-                    f"Invalid selector type @{selector_type}. "
-                    "Must be @s, @a, @p, @r, or @e"
-                )
-
-            # If there are brackets, basic validation
-            if "[" in v:
-                if not v.endswith("]"):
-                    raise ValueError("Selector brackets must be closed")
-
-            return v
-
-        raise ValueError(f"Invalid selector: {v}. Must be player name or @selector")
+from mc_commands.target import Target
 
 
 class GiveItem(BaseModel):
@@ -90,7 +43,7 @@ class GiveCount(BaseModel):
 class GiveCommand(BaseModel):
     """Complete give command with all validated components."""
 
-    targets: GiveTargets = Field(..., description="Entity selector(s)")
+    targets: Target = Field(..., description="Entity selector")
     item: GiveItem = Field(..., description="Item to give")
     count: GiveCount = Field(default_factory=GiveCount, description="Optional quantity")
 
@@ -100,7 +53,7 @@ class GiveCommand(BaseModel):
         Returns:
             Valid /give command syntax (without leading /)
         """
-        command = f"give {self.targets.selector} {self.item.item.name}"
+        command = f"give {self.targets} {self.item.item.name}"
 
         if self.item.components:
             command += self.item.components

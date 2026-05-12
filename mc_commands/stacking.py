@@ -1,8 +1,9 @@
 """Item stacking utilities for breaking quantities into stack-sized groups."""
 
 from mc_commands.container import Container, ContainerItem
-from mc_commands.give import GiveCommand, GiveCount, GiveItem, GiveTargets
+from mc_commands.give import GiveCommand, GiveCount, GiveItem
 from mc_commands.item import Item
+from mc_commands.target import NEAREST_PLAYER, Target
 
 
 def break_into_stacks(items: list[tuple[Item, int]]) -> list[tuple[Item, int]]:
@@ -50,7 +51,7 @@ def break_into_stacks(items: list[tuple[Item, int]]) -> list[tuple[Item, int]]:
 
 
 def shulker_give(
-    items: list[tuple[Item, int]], shulker_box: Item, target: str = "@p"
+    items: list[tuple[Item, int]], shulker_box: Item, target: Target = NEAREST_PLAYER
 ) -> GiveCommand:
     """Create a give command for a shulker box populated with items.
 
@@ -58,7 +59,7 @@ def shulker_give(
         items: List of (Item, total_quantity) pairs to populate the shulker box.
                Quantities will be broken into stacks respecting item stack sizes.
         shulker_box: The shulker_box Item to give.
-        target: Target selector for the give command (default: "@p").
+        target: Target selector for the give command (default: NEAREST_PLAYER/@p).
 
     Returns:
         GiveCommand that gives a shulker box with items inside.
@@ -71,7 +72,7 @@ def shulker_give(
         >>> dirt = Item(id=3, name="dirt", display_name="Dirt", stack_size=64)
         >>> bucket = Item(id=325, name="bucket", display_name="Bucket", stack_size=16)
         >>> shulker_box = Item(id=454, name="shulker_box", display_name="Shulker Box", stack_size=1)
-        >>> cmd = shulker_give([(dirt, 129), (bucket, 50)], shulker_box, target="@p")
+        >>> cmd = shulker_give([(dirt, 129), (bucket, 50)], shulker_box, target=NEAREST_PLAYER)
         >>> print(cmd)
         /give @p shulker_box[container=[...]]
     """
@@ -94,7 +95,7 @@ def shulker_give(
     container = Container(items=container_items)
     give_item = GiveItem(item=shulker_box, components=container.to_component())
     give_command = GiveCommand(
-        targets=GiveTargets(selector=target),
+        targets=target,
         item=give_item,
         count=GiveCount(count=1),
     )
