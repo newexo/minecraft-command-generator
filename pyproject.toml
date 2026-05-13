@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mc_commands"
-version = "0.1.0"
+version = "0.1.1"
 description = "Tool for generating Minecraft commands"
 authors = ["Reuben Brasher <rkbrasher@gmail.com>"]
 license = "MIT"
@@ -23,6 +23,7 @@ jupyter = "^1.1.1"
 jupyterlab = "^4.4.8"
 matplotlib = "^3.10.7"
 seaborn = "^0.13.2"
+pyperclip = "^1.11.0"
 
 [build-system]
 requires = ["poetry-core"]
