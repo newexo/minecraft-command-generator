@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mc_commands"
-version = "0.0.2"
+version = "0.1.0"
 description = "Tool for generating Minecraft commands"
 authors = ["Reuben Brasher <rkbrasher@gmail.com>"]
 license = "MIT"
@@ -10,7 +10,7 @@ include = ["data/*", "README.md", "mc_commands/tests/test_data/*"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-minecraft-data = {git = "https://github.com/newexo/python-minecraft-data.git", branch = "master"}
+minecraft-data = {git = "https://github.com/newexo/python-minecraft-data.git", tag = "v3.20.2"}
 pydantic = "^2.12.5"
 
 [tool.poetry.group.dev.dependencies]
